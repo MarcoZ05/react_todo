@@ -1,17 +1,43 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import TodoHeader from "./TodoHeader";
+import reportWebVitals from "./reportWebVitals";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+const root = ReactDOM.createRoot(document.getElementById("root"));
+reloadTasks();
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+export function reloadTasks() {
+  const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+  root.render(
+    <React.StrictMode>
+      <TodoHeader />
+      <div className="TodoList">
+        {tasks.map((task, i) => (
+          <div
+            key={i}
+            className={
+              (task.completed ? "completedTask" : "ongoingTask") + " task"
+            }
+            onClick={() => {
+              task.completed = !task.completed;
+              localStorage.setItem("tasks", JSON.stringify(tasks));
+              reloadTasks();
+            }}
+            onContextMenu={(event) => {
+              tasks.splice(i, 1);
+              localStorage.setItem("tasks", JSON.stringify(tasks));
+              reloadTasks();
+              event.preventDefault();
+            }}
+          >
+            {task.name}
+          </div>
+        ))}
+      </div>
+    </React.StrictMode>
+  );
+}
+
 reportWebVitals();
